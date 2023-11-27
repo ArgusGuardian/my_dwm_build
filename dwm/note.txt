@@ -1,0 +1,10 @@
+underline
+hide vacant
+bar height
+resize
+layout_menu
+cycle
+fibbo
+autostart
+systray
+vanity
