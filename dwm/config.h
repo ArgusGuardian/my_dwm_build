@@ -16,8 +16,8 @@ static const int showsystray        = 1;        /* 0 means no systray */
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
 static const int user_bh            = 2;        /* 2 is the default spacing around the bar's font */
-static const char *fonts[]          = { "IosevkaTerm:size=12" };
-static const char dmenufont[]       = "IosevkaTerm:size=12";
+static const char *fonts[]          = { "IosevkaTerm NFM:size=12:antialias=true","-wuncon-siji-medium-r-normal--10-100-75-75-c-80-iso10646-1" "," };
+static const char dmenufont[]       = "IosevkaTerm NFM:size=12:antialias=true";
 static const char col_gray1[]       = "#222222";
 static const char col_gray2[]       = "#444444";
 static const char col_gray3[]       = "#bbbbbb";
@@ -27,6 +27,19 @@ static const char *colors[][3]      = {
 	/*               fg         bg         border   */
 	[SchemeNorm] = { col_gray3, col_gray1, col_gray2 },
 	[SchemeSel]  = { col_gray4, col_cyan,  col_cyan  },
+};
+typedef struct {
+	const char *name;
+	const void *cmd;
+} Sp;
+const char *spcmd1[] = {"st", "-n", "news", "-g", "120x34", "-e","newsboat", NULL };
+const char *spcmd2[] = {"st", "-n", "spfm", "-g", "144x41", "-e", "ranger", NULL };
+const char *spcmd3[] = {"st", "-n", "spterm", "-g", "144x41", NULL };
+static Sp scratchpads[] = {
+	/* name          cmd  */
+	{"news",      spcmd1},
+	{"spranger",    spcmd2},
+	{"spterm",   spcmd3},
 };
 
 /* tagging */
@@ -43,8 +56,11 @@ static const Rule rules[] = {
 	 *	WM_NAME(STRING) = title
 	 */
 	/* class      instance    title       tags mask     isfloating   monitor */
-	{ "Gimp",     NULL,       NULL,       0,            1,           -1 },
-	{ "Firefox",  NULL,       NULL,       1 << 8,       0,           -1 },
+	// { "Gimp",	  NULL,			NULL,		0,				1,			 -1 },
+	// { "Firefox",  NULL,			NULL,		1 << 8,			0,			 -1 },
+	{ NULL,		  "news",		NULL,		SPTAG(0),		1,			 -1 },
+	{ NULL,		  "spfm",		NULL,		SPTAG(1),		1,			 -1 },
+	{ NULL,		  "spterm",		NULL,		SPTAG(2),		1,			 -1 },
 };
 
 /* layout(s) */
@@ -59,19 +75,18 @@ static const int attachbelow = 1;    /* 1 means attach after the currently activ
 static const Layout layouts[] = {
 	/* symbol     arrange function */
 	{ "[]=",      tile },    /* first entry is default */
-	// { "><>",      NULL },    /* no layout function means floating behavior */
 	{ "[M]",      monocle },
 	{ "[@]",      spiral },
-	{ "[\\]",     dwindle },
-	{ "H[]",      deck },
-	{ "TTT",      bstack },
-	{ "===",      bstackhoriz },
-	{ "HHH",      grid },
-	{ "###",      nrowgrid },
-	{ "---",      horizgrid },
-	{ ":::",      gaplessgrid },
+	// { "[\\]",     dwindle },
+	/* { "H[]",      deck }, */
+	/* { "TTT",      bstack }, */
+	// { "===",      bstackhoriz },
+	// { "HHH",      grid },
+	// { "###",      nrowgrid },
+	/* { "---",      horizgrid }, */
+	// { ":::",      gaplessgrid },
 	{ "|M|",      centeredmaster },
-	{ ">M>",      centeredfloatingmaster },
+	// { ">M>",      centeredfloatingmaster },
 	{ "><>",      NULL },    /* no layout function means floating behavior */
 	{ NULL,       NULL },
 };
@@ -92,7 +107,8 @@ static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() 
 static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL };
 static const char *termcmd[]  = { "st", NULL };
 static const char *termcmd_1[]  = { "kitty", NULL };
-static const char *file_manager[]  = {"kitty", "-e", "ranger", NULL };
+// static const char *file_manager[]  = {"kitty", "-e", "ranger", NULL };
+// static const char *rss_feed[]  = {"st", "-e", "newsboat", NULL };
 static const char *layoutmenu_cmd = "layoutmenu.sh";
 
 static const Key keys[] = {
@@ -100,7 +116,8 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
 	{ MODKEY,                       XK_Return, spawn,          {.v = termcmd } },
 	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd_1} },
-	{ MODKEY,                		    XK_f, 	   spawn,          {.v = file_manager} },
+	// { MODKEY,                	    XK_f, 	   spawn,          {.v = file_manager} },
+	// { MODKEY,                		XK_n, 	   spawn,          {.v = rss_feed} },
 	{ MODKEY,                       XK_b,      togglebar,      {0} },
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
 	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
@@ -144,6 +161,9 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_period, focusmon,       {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } },
 	{ MODKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } },
+	{ MODKEY,            			XK_n,  	   togglescratch,  {.ui = 0 } },
+	{ MODKEY,            			XK_f,	   togglescratch,  {.ui = 1 } },
+	{ MODKEY,            			XK_x,	   togglescratch,  {.ui = 2 } },
 	TAGKEYS(                        XK_1,                      0)
 	TAGKEYS(                        XK_2,                      1)
 	TAGKEYS(                        XK_3,                      2)

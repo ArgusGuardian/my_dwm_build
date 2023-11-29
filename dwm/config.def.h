@@ -16,7 +16,7 @@ static const int showsystray        = 1;        /* 0 means no systray */
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
 static const int user_bh            = 2;        /* 2 is the default spacing around the bar's font */
-static const char *fonts[]          = { "IosevkaTerm NFM:size=12:antialias=true" };
+static const char *fonts[]          = { "IosevkaTerm NFM:size=12:antialias=true","-wuncon-siji-medium-r-normal--10-100-75-75-c-80-iso10646-1" "," };
 static const char dmenufont[]       = "IosevkaTerm NFM:size=12:antialias=true";
 static const char col_gray1[]       = "#222222";
 static const char col_gray2[]       = "#444444";
@@ -27,6 +27,19 @@ static const char *colors[][3]      = {
 	/*               fg         bg         border   */
 	[SchemeNorm] = { col_gray3, col_gray1, col_gray2 },
 	[SchemeSel]  = { col_gray4, col_cyan,  col_cyan  },
+};
+typedef struct {
+	const char *name;
+	const void *cmd;
+} Sp;
+const char *spcmd1[] = {"st", "-n", "spterm", "-g", "120x34", NULL };
+const char *spcmd2[] = {"st", "-n", "spfm", "-g", "144x41", "-e", "ranger", NULL };
+const char *spcmd3[] = {"keepassxc", NULL };
+static Sp scratchpads[] = {
+	/* name          cmd  */
+	{"spterm",      spcmd1},
+	{"spranger",    spcmd2},
+	{"keepassxc",   spcmd3},
 };
 
 /* tagging */
@@ -43,8 +56,11 @@ static const Rule rules[] = {
 	 *	WM_NAME(STRING) = title
 	 */
 	/* class      instance    title       tags mask     isfloating   monitor */
-	{ "Gimp",     NULL,       NULL,       0,            1,           -1 },
-	{ "Firefox",  NULL,       NULL,       1 << 8,       0,           -1 },
+	{ "Gimp",	  NULL,			NULL,		0,				1,			 -1 },
+	{ "Firefox",  NULL,			NULL,		1 << 8,			0,			 -1 },
+	{ NULL,		  "spterm",		NULL,		SPTAG(0),		1,			 -1 },
+	{ NULL,		  "spfm",		NULL,		SPTAG(1),		1,			 -1 },
+	{ NULL,		  "keepassxc",	NULL,		SPTAG(2),		0,			 -1 },
 };
 
 /* layout(s) */
@@ -62,12 +78,12 @@ static const Layout layouts[] = {
 	{ "[M]",      monocle },
 	{ "[@]",      spiral },
 	// { "[\\]",     dwindle },
-	{ "H[]",      deck },
-	{ "TTT",      bstack },
+	/* { "H[]",      deck }, */
+	/* { "TTT",      bstack }, */
 	// { "===",      bstackhoriz },
 	// { "HHH",      grid },
 	// { "###",      nrowgrid },
-	{ "---",      horizgrid },
+	/* { "---",      horizgrid }, */
 	// { ":::",      gaplessgrid },
 	{ "|M|",      centeredmaster },
 	// { ">M>",      centeredfloatingmaster },
@@ -145,6 +161,9 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_period, focusmon,       {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } },
 	{ MODKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } },
+	{ MODKEY,            			XK_y,  	   togglescratch,  {.ui = 0 } },
+	{ MODKEY,            			XK_u,	   togglescratch,  {.ui = 1 } },
+	{ MODKEY,            			XK_x,	   togglescratch,  {.ui = 2 } },
 	TAGKEYS(                        XK_1,                      0)
 	TAGKEYS(                        XK_2,                      1)
 	TAGKEYS(                        XK_3,                      2)

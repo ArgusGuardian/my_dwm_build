@@ -30,7 +30,7 @@ static int restrict_return = 0;             /* -1 option; if 1, disables shift-r
 #endif // RESTRICT_RETURN_PATCH
 /* -fn option overrides fonts[0]; default X11 font or font set */
 #if PANGO_PATCH
-static char font[] = "monospace 10";
+static char font[] = "IosevkaTerm NFM:size=12:antialias=true";
 #else
 #if XRESOURCES_PATCH
 static char *fonts[] =
@@ -38,7 +38,7 @@ static char *fonts[] =
 static const char *fonts[] =
 #endif // XRESOURCES_PATCH
 {
-	"monospace:size=10"
+	"IosevkaTerm NFM:size=12:antialias=true"
 };
 #endif // PANGO_PATCH
 #if MANAGED_PATCH
